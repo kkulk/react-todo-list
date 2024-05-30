@@ -1,17 +1,59 @@
-import React from 'react';
-export default function Todo({ todo, toggleTodo }) {
+import React, { useState } from 'react';
+
+export default function Todo({ todo, toggleTodo, editTodo }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [newName, setNewName] = useState(todo.name);
+  const [newDueDate, setNewDueDate] = useState(todo.dueDate || '');
+
   function handleTodoClick() {
-    console.log('toggleTodo is a function:', typeof toggleTodo === 'function'); // Should log true
-    console.log('todo.id:', todo.id); // Should log the todo id
-    toggleTodo(todo.id); // Ensure this line is correct
+    toggleTodo(todo.id);
+  }
+
+  function handleEditClick() {
+    setIsEditing(true);
+  }
+
+  function handleSaveClick() {
+    console.log('Saving changes:', todo.id, newName, newDueDate);
+    editTodo(todo.id, newName, newDueDate);
+    setIsEditing(false);
+  }
+
+  function handleCancelClick() {
+    console.log('Cancelling changes:');
+    setIsEditing(false);
+    setNewName(todo.name);
+    setNewDueDate(todo.dueDate || '');
   }
 
   return (
     <div>
-      <label>
-        <input type="checkbox" checked={todo.complete} onChange={handleTodoClick} />
-        {todo.name}
-      </label>
+      {isEditing ? (
+        <>
+          <input
+            type="text"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+          />
+          <input
+            type="date"
+            value={newDueDate}
+            onChange={(e) => setNewDueDate(e.target.value)}
+          />
+          <button onClick={handleSaveClick}>Save</button>
+          <button onClick={handleCancelClick}>Cancel</button>
+        </>
+      ) : (
+        <label>
+          <input
+            type="checkbox"
+            checked={todo.complete}
+            onChange={handleTodoClick}
+          />
+          {todo.name} (Due: {todo.dueDate})
+          <button onClick={handleEditClick}>Edit</button>
+        </label>
+      )}
     </div>
   );
 }
